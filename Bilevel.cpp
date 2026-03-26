@@ -457,15 +457,15 @@ void procedure(void) {
 	avg_width = 0.0;
 	avg_Prod_Low = 0.0;
 	for (int i = 1; i <= n; i++) {
-		double ratio1 = ((double)c[i] + (double)variable[i] * (double)Prod_Up[i]) / (double)Prod_Up[i];
-		double ratio2 = ((double)c[i] + (double)variable[i] * (double)Prod_Low[i]) / (double)Prod_Low[i];
+		double convexcomb = ((double)variable[i] * (double)Prod_Up[i]) / ((double)c[i] + (double)variable[i] * (double)Prod_Up[i]);
+		convexcomb = (1 - convexcomb)*(double)Prod_Low[i] + convexcomb * (double)Prod_Up[i];
 		x[i] = 0;
 		y[i] = 0;
 		z[i] = 0;
 		xv[i] = 0;
 		yu[i] = 0;
 		zu[i] = 0;
-		ratio[i] = (ratio1 > ratio2) ? ratio1 : ratio2;
+		ratio[i] = ((double)c[i] + (double)variable[i] * (double)convexcomb) / (double)convexcomb;
 		cvariable[i] = variable[i];
 		nextinline[i] = i; //will store the order based on the ratio! This helps keep track of where each item is located. 
 		avg_a1 = avg_a1 + a1[i];
