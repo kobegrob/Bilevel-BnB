@@ -1,0 +1,6 @@
+﻿  Bilevel.cpp
+C:\Users\Kobe Grobben\source\repos\Bilevel\Bilevel\Bilevel.cpp(418,29): error C2562: 'bnb': 'void' function returning a value
+      C:\Users\Kobe Grobben\source\repos\Bilevel\Bilevel\Bilevel.cpp(372,6):
+      see declaration of 'bnb'
+  
+C:\Users\Kobe Grobben\source\repos\Bilevel\Bilevel\Bilevel.cpp(418,5): warning C4390: ';': empty controlled statement found; is this the intent?

@@ -1,0 +1,54 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Kobe Grobben\\source\\repos\\Bilevel\\Bilevel\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{46B96FBD-BB29-4C66-B0AE-EF9EE8081F29}|Bilevel.vcxproj|C:\\Users\\Kobe Grobben\\source\\repos\\Bilevel\\Bilevel\\Bilevel.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{46B96FBD-BB29-4C66-B0AE-EF9EE8081F29}|Bilevel.vcxproj|solutionrelative:Bilevel.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{46B96FBD-BB29-4C66-B0AE-EF9EE8081F29}|Bilevel.vcxproj|C:\\Users\\Kobe Grobben\\source\\repos\\Bilevel\\Bilevel\\BILEVEL_ORIG.CPP||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{46B96FBD-BB29-4C66-B0AE-EF9EE8081F29}|Bilevel.vcxproj|solutionrelative:BILEVEL_ORIG.CPP||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Bilevel.cpp",
+              "DocumentMoniker": "C:\\Users\\Kobe Grobben\\source\\repos\\Bilevel\\Bilevel\\Bilevel.cpp",
+              "RelativeDocumentMoniker": "Bilevel.cpp",
+              "ToolTip": "C:\\Users\\Kobe Grobben\\source\\repos\\Bilevel\\Bilevel\\Bilevel.cpp",
+              "RelativeToolTip": "Bilevel.cpp",
+              "ViewState": "AgIAAIYBAAAAAAAAAAAAAJ0BAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-03-05T09:24:34.351Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Bilevel_orig.cpp",
+              "DocumentMoniker": "C:\\Users\\Kobe Grobben\\source\\repos\\Bilevel\\Bilevel\\Bilevel_orig.cpp",
+              "RelativeDocumentMoniker": "Bilevel_orig.cpp",
+              "ToolTip": "C:\\Users\\Kobe Grobben\\source\\repos\\Bilevel\\Bilevel\\Bilevel_orig.cpp",
+              "RelativeToolTip": "Bilevel_orig.cpp",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAADQAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-03-02T12:04:49.24Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

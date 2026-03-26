@@ -1,0 +1,95 @@
+import random
+import math
+
+def generate_files(base_filename, n, b1, b2, value):
+    # Generating the data based on your logic
+    a1_values = [random.randint(1000, 3000) for _ in range(n)] # Scaled for feasibility
+    fixed_costs = [random.randint(1, 2000) for _ in range(n)]
+    #fixed_costs = a1_values
+    lowers = [random.randint(1000, 3000) for _ in range(n)]
+    #lowers = a1_values
+    capacities = [random.randint(low + 1000, 5000) for low in lowers]
+    #capacities = a1_values
+    #lowers = [random.randint(34, cap) for cap in capacities]
+    variable_costs = [random.randint(1, 200) for _ in range(n)]
+    #variable_costs = [math.ceil(a1tje/10) for a1tje in a1_values]
+
+    items = list(zip(a1_values, fixed_costs, capacities, lowers, variable_costs))
+
+    # 1. Generate .knp File
+    with open(f"{base_filename}.knp", 'w') as f:
+        f.write(f"{n}\t{b1}\t{b2}\n\n")
+        for item in items:
+            f.write("\t".join(map(str, item)) + "\n")
+
+    # 2. Generate .mps File
+    with open(f"{base_filename}.mps", 'w') as f:
+        f.write(f"NAME          {base_filename}\n")
+        f.write("ROWS\n L  UP_BUD\n")
+        for i in range(1, n + 1):
+            f.write(f" L  LINK{i}\n")
+        f.write(" L  LO_CAP\n")
+        for i in range(1, n + 1):
+            f.write(f" L  LB_{i}\n L  UB_{i}\n")
+        f.write(" N  OBJ\nCOLUMNS\n")
+        f.write("    INT1      'MARKER'                 'INTORG'\n")
+        
+        # X variables (Binary Selection Indicators)
+        for i, (a1, fixed, cap, low, var) in enumerate(items, 1):
+            f.write(f"    X{i:<9}UP_BUD            {a1}\n")
+            f.write(f"    X{i:<9}LINK{i:<12}1\n")
+        
+        # Z variables (Fixed Charge Indicators)
+        for i, (a1, fixed, cap, low, var) in enumerate(items, 1):
+            f.write(f"    Z{i:<9}LINK{i:<12}1\n")
+            f.write(f"    Z{i:<9}LB_{i:<14} {low}\n")
+            f.write(f"    Z{i:<9}UB_{i:<12}-{cap}\n")
+            f.write(f"    Z{i:<9}OBJ               {fixed}\n")
+
+        # Y variables (Continuous Quantities)
+        for i, (a1, fixed, cap, low, var) in enumerate(items, 1):
+            f.write(f"    Y{i:<9}LO_CAP            1\n")
+            f.write(f"    Y{i:<9}LB_{i:<14}-1\n")
+            f.write(f"    Y{i:<9}UB_{i:<14}1\n")
+            f.write(f"    Y{i:<9}OBJ               {var}\n")
+            
+        f.write("    INT1END   'MARKER'                 'INTEND'\n")
+        
+        # RHS Section
+        f.write("RHS\n")
+        f.write(f"    B          UP_BUD           {b1}\n")
+        for i in range(1, n + 1):
+            f.write(f"    B          LINK{i:<14}1\n")
+        f.write(f"    B          LO_CAP           {b2}\n")
+        
+        # BOUNDS Section
+        f.write("BOUNDS\n")
+        for i in range(1, n + 1):
+            f.write(f" UP BOUND      X{i:<17}1\n")
+        for i in range(1, n + 1):
+            f.write(f" UP BOUND      Z{i:<17}1\n")
+        for i, (a1, fixed, cap, low, var) in enumerate(items, 1):
+            f.write(f" UP BOUND      Y{i:<17}{cap}\n")
+        f.write("ENDATA\n")
+
+    # 3. Generate .aux File
+    with open(f"{base_filename}.aux", 'w') as f:
+        # N: Total variables (X and Z are binary markers, Y is continuous)
+        # M: Total Rows (UP_BUD + n*LINK + LO_CAP + n*LB + n*UB)
+        f.write(f"N {n*2}\nM {1 + 3*n}\n")
+        # LC (Column indices) and LR (Row indices)
+        for i in range(n, n + (n*2)): f.write(f"LC {i}\n")
+        for i in range(1, (1 + 3*n) + 1): f.write(f"LR {i}\n")
+        # LO (Negated Objective Coefficients for Z then Y)
+        for i in range(0,n): f.write(f"LO -{fixed_costs[i]}\n")
+        for i in range(0,n): f.write(f"LO -{variable_costs[i]}\n")
+        f.write("OS 1\n")
+
+# Usage
+for i in range(1):
+    n = 50
+    b1 = random.randint(5000,5000)
+    b2 = random.randint(5000, 5000)
+    filename = f"{n}_{16}"
+    generate_files(filename, n, b1, b2, i)
+
