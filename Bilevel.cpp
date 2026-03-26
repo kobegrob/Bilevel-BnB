@@ -135,11 +135,20 @@ int solveP1(int i, int Cleft, int xu[], int fractional) {
 	if (i == 0) return 0;
 	if (memoP1[i][Cleft][fractional] != -1) return memoP1[i][Cleft][fractional];
 
-	if (fractional == i) {
-		int maxVal = 0;
-		int minval = (Prod_Up[nextinline[i]] - Prod_Low[nextinline[i]] < Cleft) ? Prod_Up[nextinline[i]] - Prod_Low[nextinline[i]] : Cleft;
-		for (int w = 0; w <= minval; w++) {
-			int currentVal = solveP1(i - 1, Cleft - w, xu, fractional) + (w * variable[nextinline[i]]);
+	if (Prod_Low
+		[nextinline[i]] > Cleft || xu[nextinline[i]] == 1)
+	{
+		choiceZ[i][Cleft][fractional] = 0; // 0 means not taken/impossible
+		writeMemo(i, Cleft, fractional, solveP1(i - 1, Cleft, xu, fractional));  return solveP1(i - 1, Cleft, xu, fractional);
+	}
+	else if (fractional == 0) {
+		int maxVal = solveP1(i - 1, Cleft, xu, fractional);
+		if (maxVal < solveP1(i - 1, Cleft - Prod_Low[nextinline[i]], xu, fractional) + c[nextinline[i]] + (Prod_Low[nextinline[i]] * variable[nextinline[i]])) {
+			bestW = Prod_Low[nextinline[i]];
+			maxVal = solveP1(i - 1, Cleft - Prod_Low[nextinline[i]], xu, fractional) + c[nextinline[i]] + (Prod_Low[nextinline[i]] * variable[nextinline[i]]);
+		}
+		for (int w = Prod_Low[nextinline[i]] + 1; w <= Prod_Up[nextinline[i]]; w++) {
+			int currentVal = solveP1(i - 1, Cleft - w, xu, 1) + c[nextinline[i]] + (w * variable[nextinline[i]]);
 			if (currentVal > maxVal) {
 				maxVal = currentVal;
 				bestW = w; // Store the specific weight that worked best
@@ -149,49 +158,33 @@ int solveP1(int i, int Cleft, int xu[], int fractional) {
 		choiceZ[i][Cleft][fractional] = bestW;
 		writeMemo(i, Cleft, fractional, maxVal);  return maxVal;
 	}
-	else if (Prod_Low[nextinline[i]] > Cleft || xu[nextinline[i]] == 1)
-	{
-		choiceZ[i][Cleft][fractional] = 0; // 0 means not taken/impossible
-		writeMemo(i, Cleft, fractional, solveP1(i - 1, Cleft, xu, fractional));  return solveP1(i - 1, Cleft, xu, fractional);
-	}
 	else {
 		int maxVal = solveP1(i - 1, Cleft, xu, fractional);
-		if (i > fractional ) {
-			int currentVal = solveP1(i - 1, Cleft - Prod_Low[nextinline[i]], xu, fractional) + c[nextinline[i]] + (Prod_Low[nextinline[i]] * variable[nextinline[i]]);
-			if (currentVal > maxVal) {
-				maxVal = currentVal;
-				bestW = Prod_Low[nextinline[i]]; // Store the specific weight that worked best
-			}
-			choiceZ[i][Cleft][fractional] = bestW;
-			writeMemo(i, Cleft, fractional, maxVal);  return maxVal;
+		int currentVal = solveP1(i - 1, Cleft - Prod_Up[nextinline[i]], xu, fractional) + c[nextinline[i]] + (Prod_Up[nextinline[i]] * variable[nextinline[i]]);
+		if (currentVal > maxVal) {
+			maxVal = currentVal;
+			bestW = Prod_Up[nextinline[i]]; // Store the specific weight that worked best
 		}
-		else {
-			int currentVal = solveP1(i - 1, Cleft - Prod_Up[nextinline[i]], xu, fractional) + c[nextinline[i]] + (Prod_Up[nextinline[i]] * variable[nextinline[i]]);
-			if (currentVal > maxVal) {
-				maxVal = currentVal;
-				bestW = Prod_Up[nextinline[i]]; // Store the specific weight that worked best
-			}
-			choiceZ[i][Cleft][fractional] = bestW;
-			writeMemo(i, Cleft, fractional, maxVal);  return maxVal;
-		}
+		choiceZ[i][Cleft][fractional] = bestW;
+		writeMemo(i, Cleft, fractional, maxVal);  return maxVal;
 	}
 }
 
 
 // Reconstruct the solution found so far, should be called whenever we put the solution somewhere
-void reconstructSolutionP(int n, int Cleft, int bestfrac) {
+void reconstructSolutionP(int n, int Cleft) {
 	int currentCap = Cleft;
+	int bestfrac = 0;
 	for (int i = n; i > 0; i--) {
 		int optimalW = choiceZ[i][currentCap][bestfrac];
-		if (i == bestfrac) {
-			yu[nextinline[i]] = 1;
-			zu[nextinline[i]] = optimalW + Prod_Low[nextinline[i]];
-			currentCap -= optimalW;
-		}
-		else if (optimalW > 0) {
+		
+		if (optimalW > 0) {
 			yu[nextinline[i]] = 1;
 			zu[nextinline[i]] = optimalW;
 			currentCap -= optimalW;
+			if (optimalW != Prod_Low[nextinline[i]]) {
+				bestfrac = 1;
+			}
 		}
 		else {
 			yu[nextinline[i]] = 0;
@@ -213,23 +206,13 @@ int greedyupper(void) {
 	// Somehow save this initial solution somewhere as it might already be the optimal solution, this should happen in the procedure function somewhere
 	for (int i = 1; i <= n; i++) {
 		for (int j = 0; j <= b2; j++) {
-			for (int k = 0; k <= n; k++) {
+			for (int k = 0; k <= 1; k++) {
 				memoP1[i][j][k] = -1;
 			}
 		}
 	}
-	int bestsolution = 0;
-	int bestfrac = 0;
-	for (int j = 1; j <= n; j++) {
-		if (x[nextinline[j]] != 1) {
-			int solution = solveP1(n, b2 - Prod_Low[nextinline[j]], x, j) + c[nextinline[j]] + variable[nextinline[j]] * Prod_Low[nextinline[j]];
-			if (solution > bestsolution) {
-				bestsolution = solution;
-				bestfrac = j;
-			}
-		}
-	}
-	reconstructSolutionP(n, b2 - Prod_Low[nextinline[bestfrac]], bestfrac);
+	int bestsolution = solveP1(n, b2, x, 0);
+	reconstructSolutionP(n, b2);
 	for (int i = 1; i <= n; i++) {
 		// Make sure to save the current best solution
 		y[i] = yu[i];
@@ -380,18 +363,8 @@ void bnb(int item, int xu[], int CupLeft // all the input required meaning a num
 	
 	// Also always check if we have reached the final item as in that case we can compute the actual optimal solution
 	if (item > n) {
-		int bestsolution = 0;
-		int bestfrac = 0;
-		for (int j = 1; j <= n; j++) {
-			if (xu[nextinline[j]] != 1) {
-				int solution = solveP1(n, b2 - Prod_Low[nextinline[j]], xu, j) + c[nextinline[j]] + variable[nextinline[j]] * Prod_Low[nextinline[j]];
-				if (solution > bestsolution) {
-					bestsolution = solution;
-					bestfrac = j;
-				}
-			}
-		}
-		reconstructSolutionP(n, b2 - Prod_Low[nextinline[bestfrac]], bestfrac);
+		int bestsolution = solveP1(n, b2, xu, 0);
+		reconstructSolutionP(n, b2);
 		if (bestsolution < gub) { // because we have a minimzation problem
 			gub = bestsolution;
 			for (int i = 1; i <= n; i++) {
@@ -412,14 +385,8 @@ void bnb(int item, int xu[], int CupLeft // all the input required meaning a num
 			time_limit_reached = true;
 			return;
 		}
-		for (int j = 1; j < item; j++) {
-			if (time_limit_reached) return;
-			if (xu[nextinline[j]] != 1) {
-				if (time_limit_reached) return;
-				locallower = solveP1(item - 1, w - Prod_Low[nextinline[j]], xu, j) + c[nextinline[j]] + variable[nextinline[j]] * Prod_Low[nextinline[j]] + omega(item, CupLeft, b2 - w, 0);
-				if (locallower >= gub) return;
-			}
-		}
+		locallower = solveP1(item - 1, w, xu, 0) + omega(item, CupLeft, b2 - w, 0);
+		if (locallower >= gub) return;
 	}
 	// should be depth first branch and bound always checking if the upper level problem is still feasible
 	if (a1[nextinline[item]] <= CupLeft) {
@@ -448,10 +415,10 @@ void procedure(void) {
 	memoBellman.assign(n + 1, std::vector<double>(b1 + 1, -1));
 	memoP1.assign(n + 1,
 		std::vector<std::vector<int>>(b2 + 1,
-			std::vector<int>(n + 1, -1)));// Allocate the correct memory to this global variable and initialize
+			std::vector<int>(2, -1)));// Allocate the correct memory to this global variable and initialize
 	choiceZ.assign(n + 1,
 		std::vector<std::vector<int>>(b2 + 1,
-			std::vector<int>(n + 1, -1)));
+			std::vector<int>(2, -1)));
 	gub = INF;
 	avg_a1 = 0.0;
 	avg_width = 0.0;
@@ -490,7 +457,7 @@ void procedure(void) {
 	// Make sure we start with a clear slate for the memory
 	for (int i = 1; i <= n; i++) {
 		for (int j = 0; j <= b2; j++) {
-			for (int k = 0; k <= n; k++) {
+			for (int k = 0; k <= 1; k++) {
 				memoP1[i][j][k] = -1;
 			}
 		}
