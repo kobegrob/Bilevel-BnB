@@ -1,24 +1,15 @@
-// hide unsafe warnings wrt deprecated input/output commands
-#define _CRT_SECURE_NO_WARNINGS 1
-#pragma warning(disable: 4996)
 
-// memory leak detection
-#define _CRTDBG_MAP_ALLOC
 
 #include <iostream>
-#include <crtdbg.h>
-
-#ifdef _DEBUG
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
-#endif
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <conio.h>
 #include <time.h>
+
+#include <algorithm>
+#include <cstdio>
+#include <ctime>
+#include <cstddef>
 
 #define maxn 10000
 #define maxb 15000
@@ -82,6 +73,5 @@ int main () {
 	elapsed_time = (float) (clock() - start_time)/ CLOCKS_PER_SEC;
 	output ();
 	printf ("\n	Computation time: %.2f seconds\n", elapsed_time);
-	_CrtDumpMemoryLeaks();
-	_getch (); return 0;
+	return 0;
 }
