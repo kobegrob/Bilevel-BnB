@@ -354,6 +354,7 @@ int omega_dense(int i, int Cup, int Clow, int fractional) {
 
 void bnb(int item, int xu[], int CupLeft // all the input required meaning a number to signal what item we are considering + the set of interdicted items x
 ) {
+	nodes++;
 	if (time_limit_reached) return;
 	double elapsed = (double)(clock() - global_start) / CLOCKS_PER_SEC;
 	if (elapsed >= TIME_LIMIT) {

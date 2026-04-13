@@ -17,7 +17,7 @@
 
 typedef int mat[maxn+1];
 
-int n, b1, b2;
+int n, b1, b2, nodes;
 double avg_a1, avg_width, avg_Prod_Low;// Where n is the number of items, b1 is the size of the upper level knapsack and b2 the size of the lower level knapsack
 mat c, a1, Prod_Up, Prod_Low, variable, x, y, z, cvariable; // C is the fixed value of an item, a1 is the weight in the upper level, Prod_Up and Prod_Low
 // are the upper and lower bound of an item in the lower level, variable represents the variable value of an item and x represents upper level items
@@ -66,12 +66,13 @@ void procedure (void);
 
 int main () {
 	double elapsed_time; clock_t start_time;
-	
+	nodes = 0;
 	input ();
 	start_time= clock();
 	procedure ();
 	elapsed_time = (float) (clock() - start_time)/ CLOCKS_PER_SEC;
 	output ();
 	printf ("\n	Computation time: %.2f seconds\n", elapsed_time);
+	printf ("\n	Nodes Visited: %d seconds\n", nodes);
 	return 0;
 }
