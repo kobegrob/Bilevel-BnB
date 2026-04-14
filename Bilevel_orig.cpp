@@ -12,7 +12,7 @@
 #include <cstddef>
 
 #define maxn 10000
-#define maxb 15000
+#define maxb 1500000
 
 
 typedef int mat[maxn+1];

@@ -56,57 +56,57 @@ COLUMNS
     X10       UP_BUD            1
     X10       LINK10          1
     Z1        LINK1           1
-    Z1        LB_1              3
+    Z1        LB_1              2
     Z1        UB_1           -4
-    Z1        OBJ               3
+    Z1        OBJ               1
     Z2        LINK2           1
-    Z2        LB_2              9
-    Z2        UB_2           -14
-    Z2        OBJ               9
+    Z2        LB_2              5
+    Z2        UB_2           -13
+    Z2        OBJ               1
     Z3        LINK3           1
     Z3        LB_3              2
-    Z3        UB_3           -2
-    Z3        OBJ               2
+    Z3        UB_3           -3
+    Z3        OBJ               1
     Z4        LINK4           1
     Z4        LB_4              1
-    Z4        UB_4           -2
-    Z4        OBJ               1
+    Z4        UB_4           -1
+    Z4        OBJ               2
     Z5        LINK5           1
-    Z5        LB_5              10
+    Z5        LB_5              6
     Z5        UB_5           -15
-    Z5        OBJ               10
+    Z5        OBJ               1
     Z6        LINK6           1
-    Z6        LB_6              5
-    Z6        UB_6           -6
-    Z6        OBJ               5
+    Z6        LB_6              3
+    Z6        UB_6           -7
+    Z6        OBJ               1
     Z7        LINK7           1
-    Z7        LB_7              3
+    Z7        LB_7              2
     Z7        UB_7           -4
-    Z7        OBJ               3
+    Z7        OBJ               1
     Z8        LINK8           1
-    Z8        LB_8              5
-    Z8        UB_8           -10
-    Z8        OBJ               5
+    Z8        LB_8              3
+    Z8        UB_8           -7
+    Z8        OBJ               1
     Z9        LINK9           1
-    Z9        LB_9              5
-    Z9        UB_9           -9
-    Z9        OBJ               5
+    Z9        LB_9              3
+    Z9        UB_9           -7
+    Z9        OBJ               1
     Z10       LINK10          1
     Z10       LB_10             1
     Z10       UB_10          -1
-    Z10       OBJ               1
+    Z10       OBJ               2
     Y1        LO_CAP            1
     Y1        LB_1             -1
     Y1        UB_1             1
-    Y1        OBJ               1
+    Y1        OBJ               2
     Y2        LO_CAP            1
     Y2        LB_2             -1
     Y2        UB_2             1
-    Y2        OBJ               1
+    Y2        OBJ               5
     Y3        LO_CAP            1
     Y3        LB_3             -1
     Y3        UB_3             1
-    Y3        OBJ               1
+    Y3        OBJ               2
     Y4        LO_CAP            1
     Y4        LB_4             -1
     Y4        UB_4             1
@@ -114,23 +114,23 @@ COLUMNS
     Y5        LO_CAP            1
     Y5        LB_5             -1
     Y5        UB_5             1
-    Y5        OBJ               2
+    Y5        OBJ               6
     Y6        LO_CAP            1
     Y6        LB_6             -1
     Y6        UB_6             1
-    Y6        OBJ               1
+    Y6        OBJ               3
     Y7        LO_CAP            1
     Y7        LB_7             -1
     Y7        UB_7             1
-    Y7        OBJ               1
+    Y7        OBJ               2
     Y8        LO_CAP            1
     Y8        LB_8             -1
     Y8        UB_8             1
-    Y8        OBJ               1
+    Y8        OBJ               3
     Y9        LO_CAP            1
     Y9        LB_9             -1
     Y9        UB_9             1
-    Y9        OBJ               1
+    Y9        OBJ               3
     Y10       LO_CAP            1
     Y10       LB_10            -1
     Y10       UB_10            1
@@ -171,13 +171,13 @@ BOUNDS
  UP BOUND      Z9                1
  UP BOUND      Z10               1
  UP BOUND      Y1                4
- UP BOUND      Y2                14
- UP BOUND      Y3                2
- UP BOUND      Y4                2
+ UP BOUND      Y2                13
+ UP BOUND      Y3                3
+ UP BOUND      Y4                1
  UP BOUND      Y5                15
- UP BOUND      Y6                6
+ UP BOUND      Y6                7
  UP BOUND      Y7                4
- UP BOUND      Y8                10
- UP BOUND      Y9                9
+ UP BOUND      Y8                7
+ UP BOUND      Y9                7
  UP BOUND      Y10               1
 ENDATA

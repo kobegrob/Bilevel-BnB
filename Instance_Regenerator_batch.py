@@ -57,10 +57,13 @@ def generate_files_from_instance(base_filename, instance_path, knp_dir, mps_dir)
     n, b1, b2, a1_values, lowers, fixed_costs = read_instance_file(instance_path)
 
     # Values not specified in the input file are still generated as in the original file.
-    capacities = [random.randint(low, 2 * low) for low in lowers]
-    variable_costs = [random.randint(1, (fix // 10) + 1) for fix in fixed_costs]
+    capacities = [(low//2) + low  for low in lowers]
+    lowers1 = [(low//2) + 1 for low in lowers]
 
-    items = list(zip(a1_values, fixed_costs, capacities, lowers, variable_costs))
+    variable_costs = [(fix // 2) + 1 for fix in fixed_costs]
+    fixed_costs1 = [(fix // (2*low)) + 1 for fix in fixed_costs for low in lowers]
+
+    items = list(zip(a1_values, fixed_costs1, capacities, lowers1, variable_costs))
     base_name = Path(base_filename).name
     # 1. Generate .knp File
     knp_path = knp_dir / f"{base_name}.knp"
@@ -129,7 +132,7 @@ def generate_files_from_instance(base_filename, instance_path, knp_dir, mps_dir)
         for i in range(1, (1 + 3 * n) + 1):
             f.write(f"LR {i}\n")
         for i in range(n):
-            f.write(f"LO -{fixed_costs[i]}\n")
+            f.write(f"LO -{fixed_costs1[i]}\n")
         for i in range(n):
             f.write(f"LO -{variable_costs[i]}\n")
         f.write("OS 1\n")
@@ -162,5 +165,5 @@ def generate_files_for_folder(folder_path):
 
 
 if __name__ == '__main__':
-    input_folder = Path('/home/kobe/Documents/BnB/Bilevel-BnB/new1')
+    input_folder = Path('/home/kobe/Documents/BnB/Bilevel-BnB/new')
     generate_files_for_folder(input_folder)
