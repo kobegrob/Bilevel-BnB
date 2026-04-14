@@ -73,6 +73,6 @@ int main () {
 	elapsed_time = (float) (clock() - start_time)/ CLOCKS_PER_SEC;
 	output ();
 	printf ("\n	Computation time: %.2f seconds\n", elapsed_time);
-	printf ("\n	Nodes Visited: %d seconds\n", nodes);
+	printf ("\n	Nodes Visited: %d \n", nodes);
 	return 0;
 }

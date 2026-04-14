@@ -29,7 +29,7 @@ def generate_knp_file(filename, n, b1, b2):
 
 # Usage
 for i in range(5):
-    n = 40
+    n = 10
     b1 = random.randint(100,500)
     b2 = random.randint(500, 1000)
     filename = f"{n}_{i}.knp"

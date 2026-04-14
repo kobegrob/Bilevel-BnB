@@ -466,7 +466,7 @@ void procedure(void) {
 	 // This function computes all omega values before the algorithm is able to start
 	size_t states = (size_t)(n + 1) * (b1 + 1) * (b2 + 1) * 2;
 	size_t bytes = states * sizeof(int);
-	const size_t LIMIT = (size_t)19 * 1024 * 1024 * 1024; // 8 GB
+	const size_t LIMIT = (size_t)10 * 1024 * 1024 * 1024; // 8 GB
 	printf("\n	bytes: %.2f \n", (double)bytes / (1024.0 * 1024.0 * 1024.0));
 	printf("\n	Limit: %.2f \n", (double)LIMIT / (1024.0 * 1024.0 * 1024.0));
 	double threshold = (double)avg_a1 * (double)avg_Prod_Low;
