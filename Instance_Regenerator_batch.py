@@ -60,8 +60,8 @@ def generate_files_from_instance(base_filename, instance_path, knp_dir, mps_dir)
     capacities = [(low//2) + low  for low in lowers]
     lowers1 = [(low//2) + 1 for low in lowers]
 
-    variable_costs = [(fix // 2) + 1 for fix in fixed_costs]
-    fixed_costs1 = [(fix // (2*low)) + 1 for fix in fixed_costs for low in lowers]
+    fixed_costs1 = [((fix*10) // 2) + 1 for fix in fixed_costs]
+    variable_costs = [((fix*10) // (2*low)) + 1 for fix in fixed_costs for low in lowers]
 
     items = list(zip(a1_values, fixed_costs1, capacities, lowers1, variable_costs))
     base_name = Path(base_filename).name
