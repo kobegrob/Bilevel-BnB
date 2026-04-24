@@ -27,11 +27,11 @@ struct OmegaHash {
 // Sparse memoization
 std::unordered_map<OmegaState, int, OmegaHash> omg_sparse;
 using namespace std;
-int gub, glb, llb, lub, fractionindex; //These variables represent the global and local bounds as well as where the first fractional value is 
+int  llb, lub, fractionindex; //These variables represent the global and local bounds as well as where the first fractional value is 
 mat nextinline,sorteda,sortedc, initx; //These arrays are used for the initialization of the BnB algorithm 
 double ratio[maxn + 1]; //This arrays contains the ratio of value/weight
 mat xv, yu, zu; //Being able to keep the current best solution saved somewhere
-int INF = 1000000000;
+
 
 
 
@@ -352,14 +352,14 @@ int omega_dense(int i, int Cup, int Clow, int fractional) {
 
 // The Branch and Bound Function
 
-void bnb(int item, int xu[], int CupLeft // all the input required meaning a number to signal what item we are considering + the set of interdicted items x
+int bnb(int item, int xu[], int CupLeft, int inheritedLB // all the input required meaning a number to signal what item we are considering + the set of interdicted items x
 ) {
 	nodes++;
-	if (time_limit_reached) return;
+	if (time_limit_reached) return inheritedLB;
 	double elapsed = (double)(clock() - global_start) / CLOCKS_PER_SEC;
 	if (elapsed >= TIME_LIMIT) {
 		time_limit_reached = true;
-		return;
+		return inheritedLB;
 	}
 	
 	// Also always check if we have reached the final item as in that case we can compute the actual optimal solution
@@ -374,40 +374,46 @@ void bnb(int item, int xu[], int CupLeft // all the input required meaning a num
 				z[i] = zu[i];
 			}
 		}
-		return;
+		return bestsolution;
 	}
 	// Here we should test the lower bound of the problem and compare it to the upper bound, can phantom the node if solution cannot be improved, this is done in a similar way as
 	// as in the original paper. 
 	int locallower = 0;
+	int nodeLB = inheritedLB;
 	for (int w = b2; w >= 0; w--) {
-		if (time_limit_reached) return;
+		if (time_limit_reached) return nodeLB;
 		elapsed = (double)(clock() - global_start) / CLOCKS_PER_SEC;
 		if (elapsed >= TIME_LIMIT) {
 			time_limit_reached = true;
-			return;
+			return nodeLB;
 		}
 		locallower = solveP1(item - 1, w, xu, 0) + omega(item, CupLeft, b2 - w, 0);
-		if (locallower >= gub) return;
+		nodeLB = max(nodeLB, locallower);
+		if (nodeLB >= gub) return nodeLB;
 	}
 	// should be depth first branch and bound always checking if the upper level problem is still feasible
+	int bestSubtreeLB = INF;
 	if (a1[nextinline[item]] <= CupLeft) {
 		xu[nextinline[item]] = 1;
 
 		size_t savepoint = memoLog.size();
 
-		bnb(item + 1, xu, CupLeft - a1[nextinline[item]]);
-		if (time_limit_reached) return;
+		int lbTake = bnb(item + 1, xu, CupLeft - a1[nextinline[item]], nodeLB);
+		bestSubtreeLB = min(bestSubtreeLB, lbTake);
+		
 		while (memoLog.size() > savepoint) {
 			auto& e = memoLog.back();
 			memoP1[e.i][e.j][e.k] = e.oldVal;
-			memoLog.pop_back();
+			memoLog.pop_back();	
 		}
+		if (time_limit_reached) return min(bestSubtreeLB, nodeLB);
 		// Makes sure that the solution above does not influence the solution below
 	}
 
 	xu[nextinline[item]] = 0;
-	bnb(item + 1, xu, CupLeft);
-	return;
+	int lbSkip = bnb(item + 1, xu, CupLeft, nodeLB);
+	bestSubtreeLB = min(bestSubtreeLB, lbSkip);
+	return max(nodeLB, bestSubtreeLB);
 }
 
 void procedure(void) {
@@ -483,7 +489,8 @@ void procedure(void) {
 		);
 		omega = omega_dense;
 	}
-	 bnb(1, xv, b1); // Make sure that the initial x is only 0 values in order for this to work
+	glb = bnb(1, xv, b1, 0);
+	if (glb > gub) glb = gub; // Make sure that the initial x is only 0 values in order for this to work
 	 std::vector<vector<double>>().swap(memoBellman);
 	 std::vector<std::vector<std::vector<int>>>().swap(memoP1);
 	 std::vector<std::vector<std::vector<int>>>().swap(choiceZ);

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include <cmath>
 #include <algorithm>
 #include <cstdio>
 #include <ctime>
@@ -17,13 +17,14 @@
 
 typedef int mat[maxn+1];
 
-int n, b1, b2, nodes;
+int gub, glb,n, b1, b2, nodes;
 double avg_a1, avg_width, avg_Prod_Low;// Where n is the number of items, b1 is the size of the upper level knapsack and b2 the size of the lower level knapsack
 mat c, a1, Prod_Up, Prod_Low, variable, x, y, z, cvariable; // C is the fixed value of an item, a1 is the weight in the upper level, Prod_Up and Prod_Low
 // are the upper and lower bound of an item in the lower level, variable represents the variable value of an item and x represents upper level items
 // y represents what lower level items are selected and z how much of the selected items is selected.
 // Reading the problem
 clock_t global_start;
+int INF = 1000000000;
 double TIME_LIMIT = 3600.0; // seconds
 bool time_limit_reached = false;
 void input (void) {
@@ -59,6 +60,14 @@ void output (void) {
 	}
 	printf ("\n	Lower Level = %d <= %d\n", j, b2);
 	printf ("\n	Value = %d\n", k);
+	printf("\n\tBest feasible value = %d\n", gub);
+	printf("\n\tBest valid lower bound = %d\n", glb);
+
+	if (gub < INF) {
+    	double gap = 100.0 * ((double)gub - (double)glb) / std::max(1.0, fabs((double)gub));
+    	if (gap < 0.0) gap = 0.0;
+    	printf("\n\tGap = %.4f%%\n", gap);
+	}
 	return;
 }
 
