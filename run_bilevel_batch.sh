@@ -15,7 +15,7 @@ if [ ! -d "$INPUT_DIR" ]; then
   exit 1
 fi
 
-echo "problem_name,solution_time_seconds,solution_value,nodes_visited" > "$OUTPUT_CSV"
+echo "problem_name,solution_time_seconds,solution_value,gap_percent,nodes_visited" > "$OUTPUT_CSV"
 
 shopt -s nullglob
 for file in "$INPUT_DIR"/*.knp; do
@@ -34,14 +34,16 @@ for file in "$INPUT_DIR"/*.knp; do
 
   value="$(grep -E 'Value = ' "$tmp_out" | tail -n1 | sed -E 's/.*Value = *([-0-9]+).*/\1/')"
   time_sec="$(grep -E 'Computation time:' "$tmp_out" | tail -n1 | sed -E 's/.*Computation time: *([0-9.]+) seconds.*/\1/')"
+  gap="$(grep -E 'Gap = ' "$tmp_out" | tail -n1 | sed -E 's/.*Gap = *([0-9.]+)%.*/\1/')"
   nodes="$(grep -E 'Nodes Visited:' "$tmp_out" | tail -n1 | sed -E 's/.*Nodes Visited: *([0-9]+).*/\1/')"
 
   # fallback if parsing fails
   value="${value:-NA}"
   time_sec="${time_sec:-NA}"
+  gap="${gap:-NA}"
   nodes="${nodes:-NA}"
 
-  echo "$base,$time_sec,$value,$nodes" >> "$OUTPUT_CSV"
+  echo "$base,$time_sec,$value,$gap,$nodes" >> "$OUTPUT_CSV"
 
   rm -f "$tmp_out"
 done
