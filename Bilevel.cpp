@@ -141,6 +141,18 @@ int solveP1(int i, int Cleft, int xu[], int fractional) {
 		choiceZ[i][Cleft][fractional] = 0; // 0 means not taken/impossible
 		writeMemo(i, Cleft, fractional, solveP1(i - 1, Cleft, xu, fractional));  return solveP1(i - 1, Cleft, xu, fractional);
 	}
+	else if (Prod_Low
+		[nextinline[i]] == Prod_Up
+		[nextinline[i]])
+	{
+	int maxVal = solveP1(i - 1, Cleft, xu, fractional);
+	if (maxVal < solveP1(i - 1, Cleft - Prod_Low[nextinline[i]], xu, fractional) + c[nextinline[i]] + (Prod_Low[nextinline[i]] * variable[nextinline[i]])) {
+			bestW = Prod_Low[nextinline[i]];
+			maxVal = solveP1(i - 1, Cleft - Prod_Low[nextinline[i]], xu, fractional) + c[nextinline[i]] + (Prod_Low[nextinline[i]] * variable[nextinline[i]]);
+		}
+	choiceZ[i][Cleft][fractional] = bestW;
+	writeMemo(i, Cleft, fractional, maxVal);  return maxVal;
+	}
 	else if (fractional == 0) {
 		int maxVal = solveP1(i - 1, Cleft, xu, fractional);
 		if (maxVal < solveP1(i - 1, Cleft - Prod_Low[nextinline[i]], xu, fractional) + c[nextinline[i]] + (Prod_Low[nextinline[i]] * variable[nextinline[i]])) {
@@ -251,6 +263,17 @@ int omega_sparse(int i, int Cup, int Clow, int fractional) {
 		omg_sparse[state] = result;
 		return result;
 	}
+	else if (Prod_Low[nextinline[i]] == Prod_Up[nextinline[i]])
+	{
+		int minimumVal = omega_sparse(i + 1, Cup - a1[nextinline[i]], Clow, fractional);
+		int maxVal = 0;
+		int val1 = omega_sparse(i + 1, Cup, Clow - Prod_Low[nextinline[i]], fractional) + c[nextinline[i]] + (Prod_Low[nextinline[i]] * variable[nextinline[i]]);
+		int val2 = omega_sparse(i + 1, Cup, Clow, fractional);
+		maxVal = (val1 > val2) ? val1 : val2;
+		result = (minimumVal < maxVal) ? minimumVal : maxVal;
+		omg_sparse[state] = result;
+		return result;
+	}
 	else if (fractional == 0) {
 		int minimumVal = omega_sparse(i + 1, Cup - a1[nextinline[i]], Clow, fractional);
 		int maxVal = 0;
@@ -314,6 +337,16 @@ int omega_dense(int i, int Cup, int Clow, int fractional) {
 
 	if (Prod_Low[nextinline[i]] > Clow) {
 		result = omega_dense(i + 1, Cup, Clow, fractional);
+		return memo = result;
+	}
+	else if (Prod_Low[nextinline[i]] == Prod_Up[nextinline[i]]) 
+	{
+		int minimumVal = omega_dense(i + 1, Cup - a1[nextinline[i]], Clow, fractional);
+		int maxVal = 0;
+		int val1 = omega_dense(i + 1, Cup, Clow - Prod_Low[nextinline[i]], fractional) + c[nextinline[i]] + (Prod_Low[nextinline[i]] * variable[nextinline[i]]);
+		int val2 = omega_dense(i + 1, Cup, Clow, fractional);
+		maxVal = (val1 > val2) ? val1 : val2;
+		result = (minimumVal < maxVal) ? minimumVal : maxVal;
 		return memo = result;
 	}
 	else if (fractional == 0) {

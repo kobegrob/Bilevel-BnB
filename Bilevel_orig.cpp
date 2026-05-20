@@ -25,7 +25,7 @@ mat c, a1, Prod_Up, Prod_Low, variable, x, y, z, cvariable; // C is the fixed va
 // Reading the problem
 clock_t global_start;
 int INF = 1000000000;
-double TIME_LIMIT = 3600.0; // seconds
+double TIME_LIMIT = 900.0; // seconds
 bool time_limit_reached = false;
 void input (void) {
 	int i; char filename[20]; FILE *fp;
