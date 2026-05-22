@@ -57,8 +57,16 @@ def generate_files_from_instance(base_filename, instance_path, knp_dir, mps_dir)
     n, b1, b2, a1_values, lowers, fixed_costs = read_instance_file(instance_path)
 
     # Values not specified in the input file are still generated as in the original file.
-    capacities = [(low//2) + low  for low in lowers]
-    lowers1 = [(low//2) + 1 for low in lowers]
+    capacities = []
+    lowers1 = []
+
+    for low in lowers:
+        if random.random() > 0.5:   
+            capacities.append((low // 2) + low)
+            lowers1.append((low // 2) + 1)
+        else:                       
+            capacities.append(low)
+            lowers1.append(low)
 
     fixed_costs1 = [((fix*10) // 2) + 1 for fix in fixed_costs]
     variable_costs = [((fix*10) // (2*low)) + 1 for fix in fixed_costs for low in lowers]
@@ -165,5 +173,5 @@ def generate_files_for_folder(folder_path):
 
 
 if __name__ == '__main__':
-    input_folder = Path('/home/kobe/Documents/BnB/Bilevel-BnB/new')
+    input_folder = Path('/home/kobe/Documents/BnB/Bilevel-BnB/Mixed_bkp_50')
     generate_files_for_folder(input_folder)
