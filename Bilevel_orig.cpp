@@ -23,9 +23,11 @@ mat c, a1, Prod_Up, Prod_Low, variable, x, y, z, cvariable; // C is the fixed va
 // are the upper and lower bound of an item in the lower level, variable represents the variable value of an item and x represents upper level items
 // y represents what lower level items are selected and z how much of the selected items is selected.
 // Reading the problem
+double totalSolveP1Time = 0.0;
+double totalOmegaTime = 0.0;
 clock_t global_start;
 int INF = 1000000000;
-double TIME_LIMIT = 900.0; // seconds
+double TIME_LIMIT = 3600.0; // seconds
 bool time_limit_reached = false;
 void input (void) {
 	int i; char filename[20]; FILE *fp;
