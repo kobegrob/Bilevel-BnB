@@ -2,6 +2,8 @@
 #include <vector>
 #include <unordered_map>
 
+
+// Keeps track of which Omega we already know
 struct OmegaState {
 	int i, Cup, Clow, fractional;
 
@@ -13,6 +15,7 @@ struct OmegaState {
 	}
 };
 
+// Sparse representation in case of large capacities in both levels
 struct OmegaHash {
 	size_t operator()(const OmegaState& s) const {
 		// Fast integer hash (low collision, cheap)
@@ -27,14 +30,14 @@ struct OmegaHash {
 // Sparse memoization
 std::unordered_map<OmegaState, int, OmegaHash> omg_sparse;
 using namespace std;
-int  llb, lub, fractionindex; //These variables represent the global and local bounds as well as where the first fractional value is 
-mat nextinline,sorteda,sortedc, initx; //These arrays are used for the initialization of the BnB algorithm 
+int  llb, lub; //These variables represent the global and local bounds as well as where the first fractional value is 
+mat nextinline,sorteda,sortedc, initx; //These arrays are used for the initialization of the BnB algorithm, it keeps in mind the original item number
 double ratio[maxn + 1]; //This arrays contains the ratio of value/weight
 mat xv, yu, zu; //Being able to keep the current best solution saved somewhere
 
 
 
-
+// Keeping track of intermediate solutions
 vector<vector<double>> memoBellman;
 std::vector<std::vector<std::vector<int>>> memoP1;
 std::vector<std::vector<std::vector<int>>> choiceZ;
@@ -42,7 +45,7 @@ std::vector<int> omg_flat;
 struct MemoEntry { int i, j, k, oldVal; };
 std::vector<MemoEntry> memoLog;
 
-//Here two quicksort algorithms are presented 1 for the ratio array and 1 for the upper bound arrays 
+//Sorting the items based on their variable profit structure 
 int partition(int arr[], int arr2[], int low, int high)
 {
 	int pivotItem = arr2[high];
@@ -72,8 +75,7 @@ void quickSort(int arr[], int arr2[], int low, int high)
 		quickSort(arr, arr2, pi + 1, high);
 	}
 }
-//The Bellman recursion that also saves this optimal solution somewhere (note that we can simply use x[] as it is not used yet
-
+//The Bellman recursion to solve the knapsack problem from the greedy algorithm
 double Bellman(int i, int CupLeft) {
 	if (i == 0) {
 		return 0;
@@ -114,7 +116,7 @@ void reconstructSolutionB (int n, int capacity) {
 	}
 }
 
-//Here we write a function that we can use in all previous works that is able to solve p1 given a set of already interdicted items
+
 
 inline void writeMemo(int i, int j, int k, int val) {
 	if (memoP1[i][j][k] == -1) { // only log the first write (was -1 = unset)
@@ -123,6 +125,7 @@ inline void writeMemo(int i, int j, int k, int val) {
 	memoP1[i][j][k] = val;
 }
 
+// This function solves the lower-level problem using the DP presented in the paper
 int solveP1(int i, int Cleft, int xu[], int fractional) {
 	if (time_limit_reached) return 0;
 
@@ -183,7 +186,7 @@ int solveP1(int i, int Cleft, int xu[], int fractional) {
 }
 
 
-// Reconstruct the solution found so far, should be called whenever we put the solution somewhere
+// Reconstruct the best lower-level solution found using the above DP procedure
 void reconstructSolutionP(int n, int Cleft) {
 	int currentCap = Cleft;
 	int bestfrac = 0;
@@ -206,13 +209,13 @@ void reconstructSolutionP(int n, int Cleft) {
 }
 
 
-// Initial greedy algorithm to compute the first upper bound
+// Initial greedy algorithm to compute the first upper bound of the problem
 
 int greedyupper(void) {
-	// Compute the optimal solution of the upper level knapsack problem using the previously calculated ratio as objective function value --> Might be best to use COMBO
-	// or the Bellman recursion for simplicity
+	// Compute the optimal solution of the upper level knapsack problem (using the above Bellman algorithm) using the previously calculated ratio as objective function value
+	
 
-	// Using this solution compute the optimal solution of the lower level problem using some sort of DP
+	
 	Bellman(n, b1);
 	reconstructSolutionB(n, b1);
 	// Somehow save this initial solution somewhere as it might already be the optimal solution, this should happen in the procedure function somewhere
@@ -223,6 +226,7 @@ int greedyupper(void) {
 			}
 		}
 	}
+	// Using this solution compute the optimal solution of the lower level problem using the DP presented above
 	int bestsolution = solveP1(n, b2, x, 0);
 	reconstructSolutionP(n, b2);
 	for (int i = 1; i <= n; i++) {
@@ -233,9 +237,8 @@ int greedyupper(void) {
 	return bestsolution; // the upper bound value
 }
 // Omega which is used to compute a strong lower bound for the problem. 
-// Note that the currently implemented version solves the lower level problem as exactly as possible which potentially takes more time. 
 int (*omega)(int, int, int, int);
-
+// When omega is expected to be sparse
 int omega_sparse(int i, int Cup, int Clow, int fractional) {
 	if (time_limit_reached) return 0;
 
@@ -243,12 +246,12 @@ int omega_sparse(int i, int Cup, int Clow, int fractional) {
 		time_limit_reached = true;
 		return 0;
 	}
-	// 1. Boundary Checks (Keep these first)
+	// 1. Boundary Checks
 	if (Cup < 0) return INF; // Using a safe high value for "infinity"
 	if (Clow < 0) return -INF;
 	if (i > n) return 0;
 
-	// 2. THE FIX: Check if we've already solved this specific state
+	// 2. Check if we've already solved this specific state
 	OmegaState state{ i, Cup, Clow, fractional };
 	auto it = omg_sparse.find(state);
 	if (it != omg_sparse.end()) {
@@ -313,7 +316,7 @@ inline int& omg_at(int i, int Cup, int Clow, int f) {
 		(((size_t)i * (b1 + 1) + Cup) * (b2 + 1) + Clow) * 2 + f
 	];
 }
-
+// Omega when no sparse matrix is expected
 int omega_dense(int i, int Cup, int Clow, int fractional) {
 	if (time_limit_reached) return 0;
 
@@ -321,13 +324,13 @@ int omega_dense(int i, int Cup, int Clow, int fractional) {
 		time_limit_reached = true;
 		return 0;
 	}
-	// 1. Boundary Checks (Keep these first)
+	// 1. Boundary Checks 
 	if (Cup < 0) return INF; // Using a safe high value for "infinity"
 	if (Clow < 0) return -INF;
 	if (i > n) return 0;
 
 	int& memo = omg_at(i, Cup, Clow, fractional);
-	// 2. THE FIX: Check if we've already solved this specific state
+	// 2. Check if we've already solved this specific state
 	if (memo != -1) {
 		return memo;
 	}
@@ -383,10 +386,9 @@ int omega_dense(int i, int Cup, int Clow, int fractional) {
 }
 
 
-// The Branch and Bound Function
+// The main Branch-and-Bound Function
 
-int bnb(int item, int xu[], int CupLeft, int inheritedLB // all the input required meaning a number to signal what item we are considering + the set of interdicted items x
-) {
+int bnb(int item, int xu[], int CupLeft, int inheritedLB ) {
 	nodes++;
 	if (time_limit_reached) return inheritedLB;
 	double elapsed = (double)(clock() - global_start) / CLOCKS_PER_SEC;
@@ -409,8 +411,7 @@ int bnb(int item, int xu[], int CupLeft, int inheritedLB // all the input requir
 		}
 		return bestsolution;
 	}
-	// Here we should test the lower bound of the problem and compare it to the upper bound, can phantom the node if solution cannot be improved, this is done in a similar way as
-	// as in the original paper. 
+	// Here we should test the lower bound of the problem and compare it to the upper bound, can phantom the node if solution cannot be improved
 	int locallower = 0;
 	int nodeLB = inheritedLB;
 	for (int w = b2; w >= 0; w--) {
@@ -424,7 +425,7 @@ int bnb(int item, int xu[], int CupLeft, int inheritedLB // all the input requir
 		nodeLB = max(nodeLB, locallower);
 		if (nodeLB >= gub) return nodeLB;
 	}
-	// should be depth first branch and bound always checking if the upper level problem is still feasible
+	// Depth first branch-and-bound always checking if the upper level problem is still feasible
 	int bestSubtreeLB = INF;
 	if (a1[nextinline[item]] <= CupLeft) {
 		xu[nextinline[item]] = 1;
@@ -474,7 +475,7 @@ void procedure(void) {
 		zu[i] = 0;
 		ratio[i] = ((double)c[i] + (double)variable[i] * (double)convexcomb) / (double)convexcomb;
 		cvariable[i] = variable[i];
-		nextinline[i] = i; //will store the order based on the ratio! This helps keep track of where each item is located. 
+		nextinline[i] = i; //will store the order based on the variable profit! This helps keep track of where each item is located. 
 		avg_a1 = avg_a1 + a1[i];
 		avg_width += (double) (Prod_Up[i] - Prod_Low[i] + 1);
 		avg_Prod_Low += Prod_Low[i];
@@ -486,9 +487,9 @@ void procedure(void) {
 	avg_Prod_Low = (double)avg_Prod_Low / n;
 	avg_Prod_Low = min((double)n, (double)b2 / avg_Prod_Low);
 	avg_Prod_Low = (double)avg_Prod_Low / n;
-	// Some sort of sorting function first that sorts them based on the sorting algoritms above
+
 	quickSort(cvariable, nextinline, 1, n);
-	// Insert the tricks here
+
 
 	// Start of the actual bnb procedure
 	gub = greedyupper(); // Note that this also gives a first initial solution to the problem
@@ -502,7 +503,6 @@ void procedure(void) {
 			}
 		}
 	}
-	 // This function computes all omega values before the algorithm is able to start
 	size_t states = (size_t)(n + 1) * (b1 + 1) * (b2 + 1) * 2;
 	size_t bytes = states * sizeof(int);
 	const size_t LIMIT = (size_t)10 * 1024 * 1024 * 1024; // 8 GB
@@ -524,7 +524,7 @@ void procedure(void) {
 	}
 	glb = bnb(1, xv, b1, 0);
 	if (glb > gub) glb = gub; // Make sure that the initial x is only 0 values in order for this to work
-	 std::vector<vector<double>>().swap(memoBellman);
+	 std::vector<vector<double>>().swap(memoBellman); // Avoiding memory leaks
 	 std::vector<std::vector<std::vector<int>>>().swap(memoP1);
 	 std::vector<std::vector<std::vector<int>>>().swap(choiceZ);
 	 if (bytes > LIMIT || threshold < 0.0025) {
