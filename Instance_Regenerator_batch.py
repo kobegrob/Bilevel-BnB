@@ -173,5 +173,5 @@ def generate_files_for_folder(folder_path):
 
 
 if __name__ == '__main__':
-    input_folder = Path('/home/kobe/Documents/BnB/Bilevel-BnB/new_1')
+    input_folder = Path('/home/kobe/Documents/BnB/Bilevel-BnB/n_40')
     generate_files_for_folder(input_folder)

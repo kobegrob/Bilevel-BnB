@@ -34,6 +34,7 @@ int  llb, lub; //These variables represent the global and local bounds as well a
 mat nextinline,sorteda,sortedc, initx; //These arrays are used for the initialization of the BnB algorithm, it keeps in mind the original item number
 double ratio[maxn + 1]; //This arrays contains the ratio of value/weight
 mat xv, yu, zu; //Being able to keep the current best solution saved somewhere
+mat UpperW,LowerW, LowerW2, LowerUpper; // Used in the lower bound computations
 
 
 
@@ -136,8 +137,8 @@ int solveP1(int i, int Cleft, int xu[], int fractional) {
 	int bestW = 0;
 	if (Cleft < 0) return -INF;
 	if (i == 0) return 0;
+	if (Cleft > UpperW[i]) Cleft = UpperW[i];
 	if (memoP1[i][Cleft][fractional] != -1) return memoP1[i][Cleft][fractional];
-
 	if (Prod_Low
 		[nextinline[i]] > Cleft || xu[nextinline[i]] == 1)
 	{
@@ -162,7 +163,10 @@ int solveP1(int i, int Cleft, int xu[], int fractional) {
 			bestW = Prod_Low[nextinline[i]];
 			maxVal = solveP1(i - 1, Cleft - Prod_Low[nextinline[i]], xu, fractional) + c[nextinline[i]] + (Prod_Low[nextinline[i]] * variable[nextinline[i]]);
 		}
-		for (int w = Prod_Low[nextinline[i]] + 1; w <= Prod_Up[nextinline[i]]; w++) {
+		int minval = (Prod_Up[nextinline[i]] < Cleft) ? Prod_Up[nextinline[i]] : Cleft;
+		int wMin = std::max(Prod_Low[nextinline[i]] + 1, Cleft - UpperW[i - 1]);
+
+		for (int w = wMin; w <= minval; w++) {
 			int currentVal = solveP1(i - 1, Cleft - w, xu, 1) + c[nextinline[i]] + (w * variable[nextinline[i]]);
 			if (currentVal > maxVal) {
 				maxVal = currentVal;
@@ -191,6 +195,7 @@ void reconstructSolutionP(int n, int Cleft) {
 	int currentCap = Cleft;
 	int bestfrac = 0;
 	for (int i = n; i > 0; i--) {
+		if (currentCap > UpperW[i]) currentCap = UpperW[i];
 		int optimalW = choiceZ[i][currentCap][bestfrac];
 		
 		if (optimalW > 0) {
@@ -250,6 +255,8 @@ int omega_sparse(int i, int Cup, int Clow, int fractional) {
 	if (Cup < 0) return INF; // Using a safe high value for "infinity"
 	if (Clow < 0) return -INF;
 	if (i > n) return 0;
+	if (Clow > LowerW[i]) Clow = LowerW[i];
+	if (Cup > LowerUpper[i]) Cup = LowerUpper[i];
 
 	// 2. Check if we've already solved this specific state
 	OmegaState state{ i, Cup, Clow, fractional };
@@ -257,6 +264,8 @@ int omega_sparse(int i, int Cup, int Clow, int fractional) {
 	if (it != omg_sparse.end()) {
 		return it->second;
 	}
+
+	
 
 	int result; // Local variable to hold the calculation
 
@@ -283,7 +292,8 @@ int omega_sparse(int i, int Cup, int Clow, int fractional) {
 		int currentVal = 0;
 
 		int minval = (Prod_Up[nextinline[i]] < Clow) ? Prod_Up[nextinline[i]] : Clow;
-		for (int w = Prod_Low[nextinline[i]]; w <= minval; w++) {
+		int wMin = std::max(Prod_Low[nextinline[i]], Clow - LowerW[i+1]);
+		for (int w = wMin; w <= minval; w++) {
 			if (w == Prod_Up[nextinline[i]]) {
 				currentVal = omega_sparse(i + 1, Cup, Clow - w, 0) + c[nextinline[i]] + (w * variable[nextinline[i]]);
 	
@@ -329,11 +339,16 @@ int omega_dense(int i, int Cup, int Clow, int fractional) {
 	if (Clow < 0) return -INF;
 	if (i > n) return 0;
 
+	if (Clow > LowerW[i]) Clow = LowerW[i];
+	if (Cup > LowerUpper[i]) Cup = LowerUpper[i];
+
 	int& memo = omg_at(i, Cup, Clow, fractional);
 	// 2. Check if we've already solved this specific state
 	if (memo != -1) {
 		return memo;
 	}
+
+	
 
 	int result; // Local variable to hold the calculation
 
@@ -358,7 +373,8 @@ int omega_dense(int i, int Cup, int Clow, int fractional) {
 		int currentVal = 0;
 
 		int minval = (Prod_Up[nextinline[i]] < Clow) ? Prod_Up[nextinline[i]] : Clow;
-		for (int w = Prod_Low[nextinline[i]]; w <= minval; w++) {
+		int wMin = std::max(Prod_Low[nextinline[i]], Clow - LowerW[i+1]);
+		for (int w = wMin; w <= minval; w++) {
 			if (w == Prod_Up[nextinline[i]]) {
 				currentVal = omega_dense(i + 1, Cup, Clow - w, 0) + c[nextinline[i]] + (w * variable[nextinline[i]]);
 
@@ -414,7 +430,7 @@ int bnb(int item, int xu[], int CupLeft, int inheritedLB ) {
 	// Here we should test the lower bound of the problem and compare it to the upper bound, can phantom the node if solution cannot be improved
 	int locallower = 0;
 	int nodeLB = inheritedLB;
-	for (int w = b2; w >= 0; w--) {
+	for (int w = UpperW[item - 1]; w >= LowerW2[item]; w--) {
 		if (time_limit_reached) return nodeLB;
 		elapsed = (double)(clock() - global_start) / CLOCKS_PER_SEC;
 		if (elapsed >= TIME_LIMIT) {
@@ -492,6 +508,20 @@ void procedure(void) {
 
 
 	// Start of the actual bnb procedure
+	
+	// Precomputing some bounds for the w used in the lower bound computations
+	UpperW[0]=0;
+	LowerW[n + 1] = 0;
+	LowerUpper[n + 1] = 0;
+	for (int i = 1; i <= n; i++) {
+		UpperW[i]=UpperW[i-1] + Prod_Up[nextinline[i]];
+		if (UpperW[i] > b2) UpperW[i] = b2;
+		LowerW[n + 1 - i]= LowerW[n + 2 -i] + Prod_Up[nextinline[n + 1 - i]];
+		LowerUpper[n + 1 - i]= LowerUpper[n + 2 -i] + a1[nextinline[n + 1 - i]];
+	}
+	for (int i = 1; i <= n; i++) {
+    LowerW2[i] = max(0, b2 - LowerW[i]);
+	}
 	gub = greedyupper(); // Note that this also gives a first initial solution to the problem
 
 
