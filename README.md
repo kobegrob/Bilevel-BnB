@@ -1,6 +1,6 @@
 # Bilevel Branch-and-Bound Solver
 
-This repository contains an implementation of the combinatorial branch-and-bound algorithm introduced in *(insert paper reference here)* for solving bilevel mixed-integer packing problems with interdiction constraints.
+This repository contains an implementation of the combinatorial branch-and-bound algorithm introduced in *(insert archive reference here)* for solving bilevel mixed-integer packing problems with interdiction constraints.
 
 > **Note:** The current version has only been tested on **Linux**.
 
@@ -37,6 +37,10 @@ This repository contains all experimental results presented in the accompanying 
 - MiBs solver by Tahernejad et al. (2020) (https://github.com/coin-or/MibS) (Results can be found in 'Results MiBs' folder).
 
 All instance files for used for the branch-and-bound approach can be found in the folder 'Instance files'. The'Results BnB' folder contains all computational results obtained with the proposed branch-and-bound method and reported in the paper. 
+
+The most important results are: 
+
+- 
 
 ### References
 - Fischetti, M., Ljubić, I., Monaci, M., & Sinnl, M. (2017). A New General-Purpose Algorithm for Mixed-Integer Bilevel Linear Programs. Operations Research, 65(6), 1615–1637. https://doi.org/10.1287/opre.2017.1650
