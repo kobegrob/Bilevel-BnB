@@ -1,6 +1,6 @@
 # Bilevel Branch-and-Bound Solver
 
-This repository contains an implementation of the combinatorial branch-and-bound algorithm introduced in *(insert archive reference here)* for solving bilevel mixed-integer packing problems with interdiction constraints.
+This repository contains an implementation of the combinatorial branch-and-bound algorithm introduced in *(insert archive reference here)* for solving bilevel mixed-integer packing problems with interdiction constraints. The repository includes an implementation for a linear objective function, as well as two nonlinear variants: Quadratic and Logarithmic. 
 
 > **Note:** The current version has only been tested on **Linux**.
 
@@ -8,7 +8,12 @@ This repository contains an implementation of the combinatorial branch-and-bound
 
 ## Building
 
-To compile the code, run the following command in your terminal:
+To compile the code, run the appropriate command in your terminal. The source file depends on the objective function you wish to use:
+- Bilevel_Linear.cpp — linear objective
+- Bilevel_NonLinearQuad.cpp — quadratic objective
+- Bilevel_NonLinearLog.cpp — logarithmic objective
+  
+For example, to compile the linear version, run:
 
 ```bash
 g++ -std=c++17 -O2 -Wall -Wextra -o bilevel Bilevel.cpp
@@ -30,7 +35,7 @@ The first line contains n  C^U  C^L (which represent the number of items and the
 The next n lines contain w  f  c  l  v (which are the parameters explained in the paper for each of the items).
 
 ## Overview of the results
-This repository contains all experimental results presented in the accompanying paper. The proposed combinatorial branch-and-bound (BnB) approach is benchmarked against the following state-of-the-art bilevel optimization solvers:
+This repository contains all experimental results presented in the accompanying paper. The proposed combinatorial branch-and-bound (BnB) approach is benchmarked against the following state-of-the-art bilevel optimization solvers for the linear objective function:
 
 - The General-purpose bilevel solver by Fischetti et al. (2017) (https://msinnl.github.io/pages/bilevel.html) (Results can be found in 'Results General Solver' folder).
   
