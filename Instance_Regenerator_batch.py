@@ -61,7 +61,7 @@ def generate_files_from_instance(base_filename, instance_path, knp_dir, mps_dir)
     lowers1 = []
 
     for low in lowers:
-        if random.random() > 0:   
+        if random.random() > -1:   
             capacities.append((low // 2) + low)
             lowers1.append((low // 2) + 1)
         else:                       
@@ -173,5 +173,5 @@ def generate_files_for_folder(folder_path):
 
 
 if __name__ == '__main__':
-    input_folder = Path('/home/kobe/Documents/BnB/Bilevel-BnB/n_40')
+    input_folder = Path('/home/kobe/Documents/BnB/Bilevel-BnB/n_100')
     generate_files_for_folder(input_folder)
