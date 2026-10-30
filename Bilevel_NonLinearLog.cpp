@@ -32,7 +32,7 @@ std::unordered_map<OmegaState, int, OmegaHash> omg_sparse;
 using namespace std;
 int  llb, lub; //These variables represent the global and local bounds as well as where the first fractional value is 
 mat nextinline,sorteda,sortedc, initx; //These arrays are used for the initialization of the BnB algorithm, it keeps in mind the original item number
-double ratio[maxn + 1]; //This arrays contains the ratio of value/weight
+double ratio[maxn + 1], ratio_value[maxn + 1]; //This arrays contains the ratio of value/weight
 mat xv, yu, zu; //Being able to keep the current best solution saved somewhere
 mat UpperW,LowerW, LowerW2, LowerUpper; // Used in the lower bound computations
 
@@ -47,7 +47,7 @@ struct MemoEntry { int i, j, k, oldVal; };
 std::vector<MemoEntry> memoLog;
 
 //Sorting the items based on their variable profit structure 
-int partition(int arr[], int arr2[], int low, int high)
+int partition(double arr[], int arr2[], int low, int high)
 {
 	int pivotItem = arr2[high];
 	int i = low - 1;
@@ -67,7 +67,7 @@ int partition(int arr[], int arr2[], int low, int high)
 	return i + 1;
 }
 
-void quickSort(int arr[], int arr2[], int low, int high)
+void quickSort(double arr[], int arr2[], int low, int high)
 {
 	if (low < high)
 	{
@@ -93,7 +93,7 @@ double Bellman(int i, int CupLeft) {
 	}
 	else {
 		double value1 = Bellman(i - 1, CupLeft);
-		double value2 = Bellman(i - 1, CupLeft - a1[nextinline[i]]) + ratio[nextinline[i]];
+		double value2 = Bellman(i - 1, CupLeft - a1[nextinline[i]]) + ratio[nextinline[i]] * ratio_value[nextinline[i]];
 
 		result = (value1 > value2) ? value1 : value2;
 	}
@@ -494,15 +494,19 @@ void procedure(void) {
 	avg_width = 0.0;
 	avg_Prod_Low = 0.0;
 	for (int i = 1; i <= n; i++) {
-		double convexcomb = ((double)variable[i] * std::log(Prod_Up[nextinline[i]]) * Prod_Up[nextinline[i]]) / ((double)c[i] + (double)variable[i] * std::log(Prod_Up[nextinline[i]]) * Prod_Up[nextinline[i]]);
-		convexcomb = (1 - convexcomb)*(double)Prod_Low[i] + convexcomb * (double)Prod_Up[i];
+		ratio[i] = 0; 
+		for (int j = Prod_Low[i]; j <= Prod_Up[i]; j++){
+			if (ratio[i] < ((double)c[i] + (double)variable[i] * std::log(j) * j) / (double)j) {
+				ratio[i] = ((double)c[i] + (double)variable[i] * std::log(j) * j) / (double)j;
+				ratio_value[i] = j;
+			}
+		}
 		x[i] = 0;
 		y[i] = 0;
 		z[i] = 0;
 		xv[i] = 0;
 		yu[i] = 0;
 		zu[i] = 0;
-		ratio[i] = ((double)c[i] + (double)variable[i] * std::log(convexcomb) * convexcomb) / (double)convexcomb;
 		cvariable[i] = variable[i];
 		nextinline[i] = i; //will store the order based on the ratio! This helps keep track of where each item is located. 
 		avg_a1 = avg_a1 + a1[i];
@@ -517,7 +521,7 @@ void procedure(void) {
 	avg_Prod_Low = min((double)n, (double)b2 / avg_Prod_Low);
 	avg_Prod_Low = (double)avg_Prod_Low / n;
 
-	quickSort(cvariable, nextinline, 1, n);
+	quickSort(ratio, nextinline, 1, n);
 
 
 	// Start of the actual bnb procedure
