@@ -129,7 +129,7 @@ inline void writeMemo(int i, int j, int k, int val) {
 int solveP1(int i, int Cleft, int xu[], int fractional) {
 	if (time_limit_reached) return 0;
 
-	if ((double)(clock() - global_start) / CLOCKS_PER_SEC >= TIME_LIMIT) {
+	if (dp_time_limit_exceeded()) { // PERFORMANCE FIX 1: was clock() on every call; now checked every TIME_CHECK_INTERVAL calls (see Bilevel_orig.cpp)
 		time_limit_reached = true;
 		return 0;
 	}
@@ -242,7 +242,7 @@ int (*omega)(int, int, int, int);
 int omega_sparse(int i, int Cup, int Clow, int fractional) {
 	if (time_limit_reached) return 0;
 
-	if ((double)(clock() - global_start) / CLOCKS_PER_SEC >= TIME_LIMIT) {
+	if (dp_time_limit_exceeded()) { // PERFORMANCE FIX 1: was clock() on every call; now checked every TIME_CHECK_INTERVAL calls (see Bilevel_orig.cpp)
 		time_limit_reached = true;
 		return 0;
 	}
@@ -320,7 +320,7 @@ inline int& omg_at(int i, int Cup, int Clow, int f) {
 int omega_dense(int i, int Cup, int Clow, int fractional) {
 	if (time_limit_reached) return 0;
 
-	if ((double)(clock() - global_start) / CLOCKS_PER_SEC >= TIME_LIMIT) {
+	if (dp_time_limit_exceeded()) { // PERFORMANCE FIX 1: was clock() on every call; now checked every TIME_CHECK_INTERVAL calls (see Bilevel_orig.cpp)
 		time_limit_reached = true;
 		return 0;
 	}
@@ -505,13 +505,18 @@ void procedure(void) {
 	}
 	size_t states = (size_t)(n + 1) * (b1 + 1) * (b2 + 1) * 2;
 	size_t bytes = states * sizeof(int);
-	const size_t LIMIT = (size_t)10 * 1024 * 1024 * 1024; // 8 GB
+	// PERFORMANCE FIX 2: the dense-table limit used to be a fixed 10 GiB regardless of the machine's RAM,
+	// which crashed smaller machines; it is now capped at a share of physical RAM (see Bilevel_orig.cpp).
+	const size_t LIMIT = dense_omega_byte_limit();
 	printf("\n	bytes: %.2f \n", (double)bytes / (1024.0 * 1024.0 * 1024.0));
 	printf("\n	Limit: %.2f \n", (double)LIMIT / (1024.0 * 1024.0 * 1024.0));
 	double threshold = (double)avg_a1 * (double)avg_Prod_Low;
 	
 	printf("\n	Treshold: %.10f \n", threshold);
-	if (bytes > LIMIT || threshold < 0.0025) {
+	// PERFORMANCE FIX 2: decide once and remember it, so the clean-up below uses the same decision.
+	bool use_sparse_omega = (bytes > LIMIT || threshold < 0.0025);
+	printf("\n	Omega table: %s\n", use_sparse_omega ? "sparse (hash map)" : "dense");
+	if (use_sparse_omega) {
 		omg_sparse.reserve(20'000'000);
 		omega = omega_sparse;
 	}
@@ -527,7 +532,7 @@ void procedure(void) {
 	 std::vector<vector<double>>().swap(memoBellman); // Avoiding memory leaks
 	 std::vector<std::vector<std::vector<int>>>().swap(memoP1);
 	 std::vector<std::vector<std::vector<int>>>().swap(choiceZ);
-	 if (bytes > LIMIT || threshold < 0.0025) {
+	 if (use_sparse_omega) { // PERFORMANCE FIX 2: same decision as above
 		 omg_sparse.clear();
 		 omg_sparse.rehash(0);
 	 }
