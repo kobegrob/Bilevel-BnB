@@ -46,14 +46,11 @@ All instance files for used for the branch-and-bound approach can be found in th
 The most important files for the results in the paper are the following: 
 
 - Table 1: n_10, n_25, n_50 and n_100.
-- Table 4: SmartW_Mixed_10, SmartW_Mixed_25, SmartW_Mixed_50 and SmartW_Mixed_100.
-- Table 5: Heuristic_10, Heuristic_25, Heuristic_50 and Heuristic_100.
-- Table 6: SmartW_limit.
-- Table 7: StrongerLB_limit.
-- Table 8: NonLinearQuad_10, NonLinearQuad_25, NonLinearQuad_50 and NonLinearQuad_100.
-- Table 9: StrongerLBNLQuad_10, StrongerLBNLQuad_25, StrongerLBNLQuad_50 and StrongerLBNLQuad_100.
-- Table 10: NonLinearLog_10, NonLinearLog_25, NonLinearLog_50 and NonLinearLog_100.
-- Table 11: StrongerLBNLLog_10, StrongerLBNLLog_25, StrongerLBNLLog_50 and StrongerLBNLLog_100.
+- Table 2: BnB_Test.
+- Table 3: NonLinearQuad_10, NonLinearQuad_25, NonLinearQuad_50 and NonLinearQuad_100.
+- Table 4: StrongerLBNLQuad_10, StrongerLBNLQuad_25, StrongerLBNLQuad_50 and StrongerLBNLQuad_100.
+- Table 5: NonLinearLog_10, NonLinearLog_25, NonLinearLog_50 and NonLinearLog_100, StrongerLBNLLog_10, StrongerLBNLLog_25, StrongerLBNLLog_50 and StrongerLBNLLog_100.
+
 
 
 ### References
